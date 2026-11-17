@@ -1,3 +1,13 @@
 *.csv
 *.xlsx
-.idea
+.idea/
+.vscode/
+__pycache__/
+.ipynb_checkpoints/
+
+# training outputs / weights (download from Kaggle, don't commit)
+outputs/
+smoke_outputs/
+checkpoints/
+*.pt
+*.pth

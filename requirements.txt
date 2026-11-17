@@ -1,0 +1,8 @@
+# Kaggle's GPU image already has all of these installed.
+torch>=2.3
+torchvision>=0.18
+numpy
+pillow
+matplotlib
+tqdm
+torchmetrics[image]>=1.0  # FID (optional)
