@@ -1,13 +1,24 @@
-*.csv
-*.xlsx
+# Python / editors
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
 .idea/
 .vscode/
-__pycache__/
-.ipynb_checkpoints/
+.DS_Store
+Thumbs.db
 
-# training outputs / weights (download from Kaggle, don't commit)
+# Training outputs and weights (large; keep them on Kaggle or a release, not in git)
+results/
 outputs/
 smoke_outputs/
 checkpoints/
+samples/
 *.pt
 *.pth
+*.ckpt
+
+# Data
+data/
+*.csv
+*.xlsx
+*.zip
