@@ -15,7 +15,8 @@ jobs:
           python-version: "3.11"
       - name: Install CPU-only dependencies
         run: |
+          # CPU wheels first (much smaller), then the rest of requirements.txt so CI never drifts from it
           pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-          pip install numpy pillow matplotlib tqdm
+          pip install -r requirements.txt
       - name: Run every notebook cell on synthetic data
         run: python tests/smoke_test.py

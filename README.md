@@ -108,6 +108,7 @@ To run locally: `pip install -r requirements.txt`, then set `LANDSCAPE_DIR` and 
 
 ```
 landscape2art_cyclegan.ipynb   # full pipeline: data → model → training → evaluation → inference
+                               # (saved with the outputs of the final Kaggle run, epochs 42–50)
 tests/smoke_test.py            # runs every notebook cell on synthetic data (CI)
 .github/workflows/             # CI workflow
 assets/                        # README figures
