@@ -19,13 +19,15 @@ matplotlib.use("Agg")  # no windows during tests
 NOTEBOOK = Path(__file__).resolve().parents[1] / "landscape2art_cyclegan.ipynb"
 
 
-def run_notebook(work_dir: Path) -> dict:
+def run_notebook(work_dir: Path, train: bool = True) -> dict:
     os.environ["L2A_SMOKE_TEST"] = "1"
     os.environ["L2A_WORK_DIR"] = str(work_dir)
     cells = json.loads(NOTEBOOK.read_text(encoding="utf-8"))["cells"]
     ns: dict = {"__name__": "__main__"}
     for i, cell in enumerate(c for c in cells if c["cell_type"] == "code"):
         src = "".join(cell["source"])
+        if not train:
+            src =src.replace("TRAIN             = True", "TRAIN             = False")
         try:
             exec(compile(src, f"<cell {i}>", "exec"), ns)
         except Exception:
@@ -45,10 +47,26 @@ def main() -> None:
                     f"generator_{ns['ART_STYLE']}.pt", "samples/epoch_001.jpg", "results/test_000.jpg"]:
             assert (work / rel).exists(), f"missing output: {rel}"
 
+        assert ns["n_gray_removed"] == 2, f"grayscale filter removed {ns['n_gray_removed']} photos, expected 2"
+
         # A second run must resume from last.pt and not train again.
         ns2 = run_notebook(work)
         assert ns2["start_epoch"] == ns["EPOCHS"], "resume from checkpoint failed"
         assert len(ns2["history"]) == ns["EPOCHS"]
+
+        # Evaluate-only mode: loads the checkpoint, skips training, still produces results.
+        (work / "gallery.jpg").unlink()
+        ns3 = run_notebook(work, train=False)
+        assert ns3["start_epoch"] == ns["EPOCHS"] and len(ns3["history"]) == ns["EPOCHS"]
+        assert (work / "gallery.jpg").exists(), "evaluate-only run did not produce results"
+
+        # Evaluate-only without any checkpoint must fail loudly, not evaluate random weights.
+        with tempfile.TemporaryDirectory() as empty:
+            try:
+                run_notebook(Path(empty), train=False)
+                raise AssertionError("TRAIN=False without a checkpoint should raise")
+            except FileNotFoundError:
+                pass
     print("\nSMOKE TEST PASSED")
 
 

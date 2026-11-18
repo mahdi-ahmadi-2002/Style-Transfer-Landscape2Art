@@ -43,7 +43,7 @@ Two generators learn opposite mappings, **G: X→Y** (photo → painting) and **
 | Stabilisation | 50-image history pool, Adam (2e-4, β₁ = 0.5), constant then linear LR decay | standard CycleGAN recipe |
 | Data | 256×256, resize 286 + random crop + horizontal flip, normalised to [-1, 1] | |
 
-**Data.** Domain X is about 4.3k landscape photos. Domain Y is one WikiArt style: Naive/Primitivism (~2.5k), Cubism (2.2k), Pop Art (1.5k), Ukiyo-e (1k), Northern Renaissance (2.5k), Post-Impressionism (6.4k) or Pointillism (~400 after removing non-landscapes). One CycleGAN is trained per style. 64 photos are held out for evaluation.
+**Data.** Domain X is about 4.3k landscape photos. Domain Y is one WikiArt style: Naive/Primitivism (~2.5k), Cubism (2.2k), Pop Art (1.5k), Ukiyo-e (1k), Northern Renaissance (2.5k), Post-Impressionism (6.4k) or Pointillism (~400 after removing non-landscapes). One CycleGAN is trained per style. 64 photos are held out for evaluation. Black-and-white photos (equal colour channels) are removed automatically. They carry no colour information to learn a palette from, and they made up about half of an early test gallery.
 
 ## Results
 

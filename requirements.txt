@@ -5,4 +5,4 @@ numpy
 pillow
 matplotlib
 tqdm
-torchmetrics[image]>=1.0  # FID (optional)
+scipy  # FID (matrix square root)

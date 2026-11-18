@@ -24,15 +24,15 @@ You don't need to type any paths. The notebook finds both folders under `/kaggle
 Open the right sidebar → **Session options** (or **Settings**):
 
 - **Accelerator:** `GPU T4 x2` or `GPU P100`. Training uses one GPU, so either is fine.
-- **Internet:** **On**. It's only needed for the FID cell, which downloads Inception weights once.
+- **Internet:** **On**. It's only needed to download the Inception-v3 weights for FID (~100 MB, once). Nothing is installed with `pip`. If you switch Internet on during a session, restart the session (**Run → Restart & clear outputs**) so the kernel actually gets network access.
 - **Persistence:** leave as default.
 
 ## 4. Quick check (about 2 minutes, recommended)
 
 Before starting the long run, check that everything is set up:
 
-1. Run the first cell, then the next three (**Setup** and **Data**).
-2. The output should show `device: cuda (Tesla T4)` (or P100), followed by a line like
+1. Run the cells from the top through **Data**.
+2. The output should show `device: cuda (Tesla T4)` (or P100), `Internet: OK`, `FID: Inception-v3 weights ready.`, and a line like
    `Photos : /kaggle/input/... -> ~4250 train / 64 test` and `Art : .../Naive_Art_Primitivism -> ~2400 images`.
 3. If a folder is not found, see Troubleshooting below.
 
@@ -53,6 +53,18 @@ Click **Save Version** (top right), choose **Save & Run All (Commit)**, then **S
 3. **Save Version → Save & Run All** again.
 
 `RESUME_FROM = "auto"` finds `checkpoints/last.pt` from the previous output, but only if it was trained on the same `ART_STYLE`. Training then continues from the next epoch, with the optimiser state, LR schedule and loss history all restored.
+
+## 6b. Only evaluate a finished run (no retraining)
+
+Use this to compute FID or results for a run that has already trained, for example one where FID was skipped.
+
+1. Make the checkpoint available. If `checkpoints/last.pt` is still in this session's **Output** panel, it's already there. Otherwise, attach that version's output as in step 6.
+2. In the first cell, set `TRAIN = False`.
+3. Click **Run All**.
+
+The notebook loads the checkpoint and prints `TRAIN=False: skipping training ...`. It then runs only the evaluation cells: curves, gallery, cycle, FID and your own photos. This takes a few minutes. Running only the FID cell won't work after a restart, because it needs the models and data lists that the earlier cells create.
+
+Set `TRAIN` back to `True` afterwards. If `TRAIN = False` and no checkpoint is found, the notebook stops with an error instead of evaluating an untrained model.
 
 ## 7. Get the results
 
@@ -81,6 +93,8 @@ Upload your photos as a dataset (**+ Add Input → Upload**), set `MY_PHOTOS_DIR
 | `device: cpu` / the GPU warning appears | Set Accelerator to a GPU (step 3). If the GPU option is greyed out, verify your phone number. |
 | `CUDA out of memory` | Set `BATCH_SIZE = 2`. |
 | `Non-finite loss` | Set `USE_AMP = False`, or lower `LR` to `1e-4`. |
-| FID cell fails | Turn Internet on, or set `COMPUTE_FID = False`. |
+| `Internet: NOT reachable` / `FID will be skipped` | Training still runs; only FID is skipped. Check that Internet is on, then restart the session. If it still fails, download [`inception_v3_google-0cc3c7bd.pth`](https://download.pytorch.org/models/inception_v3_google-0cc3c7bd.pth) on your computer, upload it as a Kaggle dataset (**+ Add Input → Upload**), and attach it. The notebook finds it automatically. |
+| FID missing from a finished run | Follow step 6b (`TRAIN = False`, Run All). |
 | Results look almost the same as the input photo | Train for more epochs; check that `LAMBDA_IDENTITY` is 0.5, not 5. |
+| Gallery shows black-and-white photos | Keep `DROP_GRAYSCALE = True` (the default). The data cell prints how many it removed. |
 | Run stopped at 12 h | Expected for long runs. Resume as described in step 6. |
